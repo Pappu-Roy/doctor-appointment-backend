@@ -1,0 +1,115 @@
+// Doctor Appointment Booking System - Prisma Schema
+// Matches system-design.md (v2) — see docs
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  phone     String?
+  role      Role      @default(PATIENT)
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  doctorProfile   DoctorProfile?
+  appointments    Appointment[]  @relation("PatientAppointments")
+  refreshTokens   RefreshToken[]
+
+  @@index([email])
+}
+
+// Hashed refresh tokens, tracked so logout / revoke is possible.
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tokenHash String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model DoctorProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  specialty   String
+  experience  Int      @default(0)
+  fee         Decimal  @default(0)
+  bufferTime  Int      @default(5) // minutes between appointments
+  bio         String?
+  location    String?
+  isVerified  Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
+
+  availability Availability[]
+  appointments Appointment[]  @relation("DoctorAppointments")
+
+  @@index([specialty])
+}
+
+model Availability {
+  id        String        @id @default(uuid())
+  doctorId  String
+  doctor    DoctorProfile @relation(fields: [doctorId], references: [id])
+  dayOfWeek Int // 0 = Sunday ... 6 = Saturday
+  startTime String        // "09:00"
+  endTime   String        // "13:00"
+
+  @@index([doctorId])
+}
+
+model Appointment {
+  id        String            @id @default(uuid())
+  patientId String
+  patient   User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctorId  String
+  doctor    DoctorProfile     @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  startTime DateTime          // UTC
+  endTime   DateTime          // UTC
+  status    AppointmentStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+
+  review Review?
+
+  @@unique([doctorId, startTime]) // double-booking guard
+  @@index([doctorId, status])
+  @@index([patientId, status])
+}
+
+model Review {
+  id            String      @id @default(uuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  patientId     String
+  doctorId      String
+  rating        Int
+  comment       String?
+  createdAt     DateTime    @default(now())
+}

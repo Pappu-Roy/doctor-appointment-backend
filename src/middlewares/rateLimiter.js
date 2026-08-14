@@ -1,0 +1,17 @@
+const rateLimit = require("express-rate-limit");
+
+// Protects /login and /register from brute-force / spam.
+// 10 requests per 15 minutes per IP.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many attempts. Please try again after 15 minutes.",
+    errors: [],
+  },
+});
+
+module.exports = { authLimiter };
