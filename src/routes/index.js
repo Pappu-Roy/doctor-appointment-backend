@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.use("/auth", authRoutes);
 router.use("/doctors", doctorRoutes);
-// router.use("/appointments", appointmentRoutes);
+router.use("/appointments", appointmentRoutes);
 // router.use("/reviews", reviewRoutes);
 // router.use("/admin", adminRoutes);
 
