@@ -1,6 +1,7 @@
 const express = require("express");
 const authRoutes = require("./auth.routes");
 const doctorRoutes = require("./doctor.routes");
+const appointmentRoutes = require("./appointment.routes");
 // Day 3+: const appointmentRoutes = require("./appointment.routes");
 // Day 4+: const reviewRoutes = require("./review.routes");
 // Day 4+: const adminRoutes = require("./admin.routes");
