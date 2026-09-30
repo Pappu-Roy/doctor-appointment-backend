@@ -43,16 +43,24 @@ const availabilitySchema = z.object({
         z
           .object({
             dayOfWeek: z.coerce.number().int().min(0).max(6),
-            startTime: z.string().regex(timeRegex, "Use HH:mm format, e.g. 09:00"),
-            endTime: z.string().regex(timeRegex, "Use HH:mm format, e.g. 13:00"),
+            startTime: z
+              .string()
+              .regex(timeRegex, "Use HH:mm format, e.g. 09:00"),
+            endTime: z
+              .string()
+              .regex(timeRegex, "Use HH:mm format, e.g. 13:00"),
           })
           .refine((slot) => slot.startTime < slot.endTime, {
             message: "startTime must be before endTime",
             path: ["endTime"],
-          })
+          }),
       )
       .min(1, "Provide at least one availability slot"),
   }),
 });
 
-module.exports = { listDoctorsQuerySchema, updateDoctorProfileSchema, availabilitySchema };
+module.exports = {
+  listDoctorsQuerySchema,
+  updateDoctorProfileSchema,
+  availabilitySchema,
+};
