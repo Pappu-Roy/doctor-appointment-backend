@@ -7,6 +7,7 @@ const {
   listDoctorsQuerySchema,
   updateDoctorProfileSchema,
   availabilitySchema,
+  slotsQuerySchema,
 } = require("../validators/doctor.validator");
 
 const router = express.Router();
@@ -14,6 +15,7 @@ const router = express.Router();
 // --- Public routes (no login needed — patients browsing before signup) ---
 router.get("/", validate(listDoctorsQuerySchema), doctorController.listDoctors);
 router.get("/:id", doctorController.getDoctorById);
+router.get("/:id/slots", validate(slotsQuerySchema), doctorController.getSlots);
 
 // --- Protected routes ---
 // Order matters: protect (are you logged in?) -> allowRoles (are you the

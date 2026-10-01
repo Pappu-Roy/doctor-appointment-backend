@@ -24,8 +24,11 @@ class ApiError extends Error {
   static notFound(message = "Resource not found") {
     return new ApiError(404, message);
   }
-  static conflict(message = "Conflict") {
-    return new ApiError(409, message);
+    static conflict(message = "Conflict", errors = []) {
+    return new ApiError(409, message, errors);
+  }
+  static unprocessable(message = "Unprocessable", errors = []) {
+    return new ApiError(422, message, errors);
   }
 }
 

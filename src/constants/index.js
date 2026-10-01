@@ -1,9 +1,29 @@
-const ROLES = {
-  PATIENT: "PATIENT",
-  DOCTOR: "DOCTOR",
-  ADMIN: "ADMIN",
-};
-
+const ROLES = { PATIENT: "PATIENT", DOCTOR: "DOCTOR", ADMIN: "ADMIN" };
 const REFRESH_COOKIE_NAME = "refreshToken";
 
-module.exports = { ROLES, REFRESH_COOKIE_NAME };
+const APPOINTMENT_STATUS = {
+  PENDING: "PENDING", CONFIRMED: "CONFIRMED",
+  COMPLETED: "COMPLETED", CANCELLED: "CANCELLED",
+};
+
+const SLOT_MINUTES = 30;
+
+// State machine: বর্তমান status থেকে কোথায় কোথায় যাওয়া যাবে
+const STATUS_TRANSITIONS = {
+  PENDING: ["CONFIRMED", "CANCELLED"],
+  CONFIRMED: ["COMPLETED", "CANCELLED"],
+  COMPLETED: [],
+  CANCELLED: [],
+};
+
+// Authorization Matrix: কোন role কোন status বসাতে পারবে
+const ROLE_ALLOWED_TARGETS = {
+  PATIENT: ["CANCELLED"],
+  DOCTOR: ["CONFIRMED", "COMPLETED", "CANCELLED"],
+  ADMIN: ["CANCELLED"],
+};
+
+module.exports = {
+  ROLES, REFRESH_COOKIE_NAME, APPOINTMENT_STATUS,
+  SLOT_MINUTES, STATUS_TRANSITIONS, ROLE_ALLOWED_TARGETS,
+};

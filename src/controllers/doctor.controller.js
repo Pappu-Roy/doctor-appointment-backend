@@ -1,5 +1,6 @@
 const asyncHandler = require("../utils/asyncHandler");
 const doctorService = require("../services/doctor.service");
+const { getDaySlots } = require("../services/slotService");
 
 const listDoctors = asyncHandler(async (req, res) => {
   const result = await doctorService.listDoctors(req.query);
@@ -44,4 +45,12 @@ const setAvailability = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = { listDoctors, getDoctorById, updateProfile, setAvailability };
+const getSlots = asyncHandler(async (req, res) => {
+  const { bufferTime, slots } = await getDaySlots(req.params.id, req.query.date);
+  res.status(200).json({
+    success: true, message: "Slots fetched",
+    data: { date: req.query.date, bufferTime, slots },
+  });
+});
+
+module.exports = { listDoctors, getDoctorById, updateProfile, setAvailability, getSlots };

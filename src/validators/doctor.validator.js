@@ -1,4 +1,5 @@
 const { z } = require("zod");
+const { isValidDateString } = require("../utils/generateSlots");
 
 // GET /api/doctors?page=1&limit=10&specialty=cardio&location=dhaka
 // z.coerce.number() is important here — query params always arrive as
@@ -59,8 +60,16 @@ const availabilitySchema = z.object({
   }),
 });
 
+const slotsQuerySchema = z.object({
+  params: z.object({ id: z.string().uuid("Invalid doctor id") }),
+  query: z.object({
+    date: z.string().refine(isValidDateString, "date must be a real date in YYYY-MM-DD format"),
+  }),
+});
+
 module.exports = {
   listDoctorsQuerySchema,
   updateDoctorProfileSchema,
   availabilitySchema,
+  slotsQuerySchema,
 };
